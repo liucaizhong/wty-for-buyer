@@ -101,45 +101,56 @@ class ScheduleManagement extends Component {
   }
 
   componentDidMount() {
+    // get b2&b4&b6
+    const b2Block = document.getElementById('b2-block')
+    const b4Block = document.getElementById('b4-block')
+    const b6Block = document.getElementById('b6-block')
     // calculate scrollLeft
     // Sun: 0,...,Sat: 6
     if (!this.initial) {
       this.initial = true
       const dayOfWeek = moment().day()
       const b6Width = document.getElementsByClassName('b6')[0].clientWidth
-      const rightWidth = document.getElementsByClassName('right')[0].clientWidth
+      const rightBlock = document.getElementById('right')
+      const rightWidth = rightBlock.clientWidth
+      rightBlock.style.width = `${rightWidth}px`
       const scrollLeft = dayOfWeek ? dayOfWeek * b6Width : 7 * b6Width
-
-      const b2Block = document.getElementById('b2-block')
-      // b2Block.style.width = `${b6Width * 3}px`
+      // unify initial scrollLeft
       b2Block.style.width = `${rightWidth}px`
       b2Block.scrollLeft = scrollLeft
-
-      const b4Block = document.getElementById('b4-block')
-      // b4Block.style.width = `${b6Width * 3}px`
       b4Block.style.width = `${rightWidth}px`
       b4Block.scrollLeft = scrollLeft
-
-      const b6Block = document.getElementById('b6-block')
+      b6Block.style.width = `${rightWidth}px`
       b6Block.scrollLeft = scrollLeft
     }
 
     // calculate the first&last date of request's domain
     // const firstD = moment().day(0).format('YYYYMMDD')
     // const lastD = moment().day(6).format('YYYYMMDD')
-
-    document.getElementById('b6-block').onscroll = (e) => {
-      const scrollLeft = e.target.scrollLeft
-      // sync scrollLeft of b2&b4
-      const b2Block = document.getElementById('b2-block')
-      b2Block.scrollLeft = scrollLeft
-
-      const b4Block = document.getElementById('b4-block')
-      b4Block.scrollLeft = scrollLeft
+    let setFinalScrollLeftTimer
+    const scrollEventHandler = (e) => {
       // calculate current month
-      const b6Width = document.getElementsByClassName('b6')[0].clientWidth
-      const curDate = this.state.daysData[Math.floor(scrollLeft / b6Width)].date
-
+      const unitWidth = document.getElementsByClassName('b2')[0].clientWidth
+      const scrollLeft = e.target.scrollLeft
+      const curDate = this.state.daysData[Math.floor(scrollLeft / unitWidth)].date
+      // a timer func for setting final scrollLeft
+      if(setFinalScrollLeftTimer) {
+        clearTimeout(setFinalScrollLeftTimer)
+      }
+      setFinalScrollLeftTimer = setTimeout(() => {
+        const finalScrollLeft = Math.round(scrollLeft / unitWidth) * unitWidth
+        b2Block.scrollLeft = finalScrollLeft
+        b4Block.scrollLeft = finalScrollLeft
+        b6Block.scrollLeft = finalScrollLeft
+      }, 300)
+      // sync scrollLeft of b2&b4&b6
+      b2Block.scrollLeft = scrollLeft
+      if (!Object.is(e.target, b4Block)) {
+        b4Block.scrollLeft = scrollLeft
+      }
+      if (!Object.is(e.target, b6Block)) {
+        b6Block.scrollLeft = scrollLeft
+      }
       // decide whether to get new data
       const clientWidth = e.target.clientWidth
       const scrollWidth = e.target.scrollWidth
@@ -162,14 +173,14 @@ class ScheduleManagement extends Component {
         console.log('next firstD', firstD)
         console.log('next lastD', lastD)
       }
-      // console.log('clientWidth', clientWidth)
-      // console.log('scrollLeft', scrollLeft)
-      // console.log('scrollWidth', scrollWidth)
 
       this.setState({
         curMonth: moment(curDate, 'YYYYMMDD').month(),
       })
     }
+
+    b4Block.onscroll = scrollEventHandler
+    b6Block.onscroll = scrollEventHandler
   }
 
   componentWillReceiveProps(nextProps) {}
@@ -220,11 +231,12 @@ class ScheduleManagement extends Component {
           {
             this.state.daysData.map((d, i) => {
               const isToday = this.today === d.date
+              const isSunday = moment(d.date).day()
               const allDayEvents = d.allDayEvents || []
               return (
                 <div
                   key={`b4-${i}`}
-                  className="b4"
+                  className={`b4${!isSunday ? ' is-sunday' : ''}`}
                   style={{
                     backgroundColor: isToday ?
                       'rgba(64, 176, 245, .05)' : 'inherit',
@@ -269,11 +281,12 @@ class ScheduleManagement extends Component {
           {
             this.state.daysData.map((d, i) => {
               const isToday = this.today === d.date
+              const isSunday = moment(d.date).day()
               const dayEvents = d.dayEvents || []
               return (
                 <div
                   key={`b6-${i}`}
-                  className="b6"
+                  className={`b6${!isSunday ? ' is-sunday' : ''}`}
                   style={{
                     backgroundColor: isToday ?
                       'rgba(64, 176, 245, .05)' : 'inherit',
