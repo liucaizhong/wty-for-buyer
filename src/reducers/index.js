@@ -1,6 +1,7 @@
-import { combineReducers } from 'redux'
+import scheduleScroll from './scheduleScroll'
 
-const rootReducer = combineReducers({
-})
+const rootReducer = {
+  scheduleScroll,
+}
 
 export default rootReducer

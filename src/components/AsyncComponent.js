@@ -1,7 +1,7 @@
 // used to lazy load components asynchronously
 import React, { Component } from 'react'
 
-const asyncComponent = (importComponent) => {
+const asyncComponent = importComponent => {
   class AsyncComponent extends Component {
     state = {
       component: null,

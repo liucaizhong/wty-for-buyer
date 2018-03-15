@@ -10,14 +10,14 @@ import registerServiceWorker from './registerServiceWorker'
 import './index.less'
 
 // set root font-size and make rem effective immediately
-(function (doc, win) {
+((doc, win) => {
 
-  var docEl = doc.documentElement,
+  const docEl = doc.documentElement,
     resizeEvt = 'orientationchange' in window
       ? 'orientationchange'
       : 'resize',
-    recalc = function () {
-      var clientWidth = docEl.clientWidth
+    recalc = () => {
+      const clientWidth = docEl.clientWidth
       if (!clientWidth) 
         return
       docEl.style.fontSize = 100 * (clientWidth / 640) + 'px'
@@ -38,12 +38,12 @@ const appLocale = configureAppLocale()
 addLocaleData(appLocale.data)
 
 // declare a redux store
-const store = configureStore()
+const { store, history } = configureStore()
 
 ReactDOM.render(
   <IntlProvider locale={appLocale.locale} messages={appLocale.messages}>
     <Provider store={store}>
-      <App />
+      <App history={history} />
     </Provider>
   </IntlProvider>,
   document.getElementById('root'))

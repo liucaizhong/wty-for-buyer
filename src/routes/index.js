@@ -1,15 +1,20 @@
 // configure router
 import React from 'react'
-import { BrowserRouter as Router,
-  Route, Switch, Redirect } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import { Route, Switch, Redirect } from 'react-router-dom'
+import { ConnectedRouter } from 'react-router-redux'
 import AsyncComponent from '../components/AsyncComponent'
 
 const AsyncScheduleManagement = AsyncComponent(
-  () => import('../components/ScheduleManagement'),
+  () => import('../containers/CScheduleManagement'),
 )
 
-const App = () => (
-  <Router>
+const AsyncCreateEvent = AsyncComponent(
+  () => import('../components/CreateEvent'),
+)
+
+const App = ({ history }) => (
+  <ConnectedRouter history={history}>
     <Switch>
       <Route
         exact
@@ -25,8 +30,13 @@ const App = () => (
         }}
       />
       <Route path="/schedule-m" component={AsyncScheduleManagement} />
+      <Route path="/create-e" component={AsyncCreateEvent} />
     </Switch>
-  </Router>
+  </ConnectedRouter>
 )
+
+App.propTypes = {
+  history: PropTypes.object.isRequired,
+}
 
 export default App
